@@ -1,0 +1,93 @@
+#!/usr/bin/bash
+
+# LinuxHill by lykaspars4
+# (Tested/coded inside/with Manjaro distro)
+
+# Variables
+
+export BrickHillPath=""
+
+# Functions
+
+# check_pkg - Checks for package, if it's not installed, exits with failure.
+function check_pkg {
+	package=$1
+	result=$(which $package)
+	if [ "$result" = "" ]; then
+		echo "ERROR: This package ($package) doesn't exists."
+		exit 1
+	else
+		return 0
+	fi
+}
+
+# load_config - Loads config, if it fails, exits with failure.
+# function load_config {
+# 	return 0
+# 	config=$1
+# 	$(. $config) &> /dev/null
+# 	if [ "$?" -gt 0 ]; then
+# 		echo "ERROR: Unable to load config. ($config)"
+# 		exit 1
+# 	fi
+# }
+
+# setBHPath - Looks/checks for brick-hill folder, and sets it.
+function setBHPath {
+	# Lazy check
+	target=~/.wine/drive_c/"Program Files (x86)"/"Brick Hill"
+	if [ -d "$target" ]; then
+		BrickHillPath=$target
+		return 0
+	fi
+	# The ACTUAL check
+	result=$(find ~/.wine/drive_c/ -name "Player.exe")
+	# TODO: Better check to avoid any conflicts of file name.
+	if [ -z "$result" ]; then
+		echo "ERROR: Cannot find the Brick Hill folder."
+		exit 1
+	else
+		BrickHillPath=$(dirname $result)
+	fi
+}
+
+# displayHelp - Displays help, 'nuff said.
+function displayHelp {
+	echo "Usage: linuxhill [Parameter]"
+	echo "Usage: linuxhill workshop [File]"
+}
+
+# Check for package(s), if It's there.
+
+check_pkg wine
+
+# Load config.
+# load_config ~/.linuxhill
+# TODO: Configuration file.
+
+# Check if there's any argument(s), if not, then display help and exit.
+
+if [ "$#" = 0 ]; then
+	displayHelp
+	exit 1
+fi
+
+# Setting the Brick-Hill path.
+
+setBHPath
+# echo "$BrickHillPath"
+# ls "$BrickHillPath"
+
+# Run it.
+
+if [ "$1" = "workshop" ]; then
+	wine "$BrickHillPath"/Workshop.exe $2
+else
+	wine "$BrickHillPath"/Player.exe $*
+fi
+
+# NOTE FROM EPIC PROGRAMMER: I wonder why screen flickers while launching.
+
+exit 0 # Exit without failure, hurray.
+
+# TODO: Protocol Handler.
