@@ -12,7 +12,7 @@ export BrickHillPath=""
 # check_pkg - Checks for package, if it's not installed, exits with failure.
 function check_pkg {
 	package=$1
-	result=$(which $package)
+	result=$(command -v "$package")
 	if [ "$result" = "" ]; then
 		echo "ERROR: This package ($package) doesn't exists."
 		exit 1
@@ -35,7 +35,7 @@ function check_pkg {
 # setBHPath - Looks/checks for brick-hill folder, and sets it.
 function setBHPath {
 	# Lazy check
-	target=~/.wine/drive_c/"Program Files (x86)"/"Brick Hill"
+	target=~/.wine/drive_c/"Program Files (x86)/Brick Hill"
 	if [ -d "$target" ]; then
 		BrickHillPath=$target
 		return 0
@@ -47,7 +47,7 @@ function setBHPath {
 		echo "ERROR: Cannot find the Brick Hill folder."
 		exit 1
 	else
-		BrickHillPath=$(dirname $result)
+		BrickHillPath=$(dirname "$result")
 	fi
 }
 
@@ -81,9 +81,9 @@ setBHPath
 # Run it.
 
 if [ "$1" = "workshop" ]; then
-	wine "$BrickHillPath"/Workshop.exe $2
+	wine "$BrickHillPath"/Workshop.exe "$2"
 else
-	wine "$BrickHillPath"/Player.exe $*
+	wine "$BrickHillPath"/Player.exe "$*"
 fi
 
 # NOTE FROM EPIC PROGRAMMER: I wonder why screen flickers while launching.
